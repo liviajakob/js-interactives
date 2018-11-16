@@ -1,0 +1,136 @@
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script> 
+<div style="width: 500px; padding: 10px; text-align: center;">
+<h5>Satellites at different altitudes</h5>
+<div class="center-dot">
+    <div class="earth"><div id="text">Earth</div></div>
+    <div id="description"><h4>Click to start animation</h4></div>
+    <div class="one"></div>
+    <div class="two"></div>
+    
+    <div id="circle-one"></div>
+     <div id="circle-two"  onclick="toggle();"></div>
+    
+    
+</div>
+</div>
+
+<style>
+    .center-dot {position:absolute;top:250px;left:250px;}
+.earth {
+  position:absolute;
+  width:100px;height:100px;
+  background:cornflowerblue;
+  border-radius:50%;
+  left: -45px;
+  top: -45px;
+  }
+  
+.one {width:10px;height:10px;border-radius:50%;background:cadetblue;position:absolute;}
+.two {width:10px;height:10px;border-radius:50%;background:darkred;position:absolute;}
+
+    #description{
+        height: 150px;
+        width: 170px;
+        position: absolute;
+        left: -80px;
+        top: -75px;
+        background-color: aliceblue;
+        padding: 25px;
+        -webkit-border-radius: 10%;
+        -moz-border-radius: 10%;
+        border-radius: 10%;
+        border-style: solid;
+        border-width: 2px;
+        border-color: cornflowerblue;
+    }
+    
+#circle-one {
+      width: 300px;
+      height: 300px;
+      -webkit-border-radius: 50%;
+      -moz-border-radius: 50%;
+      border-radius: 50%;
+      border-style: solid;
+        border-width: 2px;
+      border-color: cadetblue;
+      position: absolute;
+      left: -145px;
+      top: -145px;
+    }
+    
+#circle-two {
+      width: 400px;
+      height: 400px;
+      -webkit-border-radius: 50%;
+      -moz-border-radius: 50%;
+      border-radius: 50%;
+      border-style: solid;
+      border-color: darkred;
+        border-width: 2px;
+      position: absolute;
+      left: -195px;
+      top: -195px;
+        cursor: pointer;
+    }
+    
+#text{
+    width: 100%;
+    text-align: center;
+    color: white;
+    padding-top: 35px;
+}
+</style>
+
+<script>
+
+var one = $('.one'),
+    two = $('.two');
+    
+// starting position
+var one_start = -1,
+    two_start = -1;
+
+// movement on?
+var on = false;
+    
+//move to initial position
+move();
+    
+//interval for movement
+setInterval(function(){
+    if(on){
+        move();
+    }
+}, 1);
+
+// toggle the animation
+function toggle(){
+    on = !on; // toggle and untoggle animation
+    $('#description').hide(); // hide the description
+    
+}
+
+/* Function to move both dots (two different ways, transform and set position)*/
+function move(){
+    ++one_start;
+    // first dot
+    var one_css = {
+        'transform': "translateX(" + (Math.sin(one_start * 0.01) * 150) + 'px)  translateY('+ Math.cos(one_start * 0.01) * 150 + "px)"
+    }
+    one.css(one_css);
+    
+    // second dot
+    ++two_start;
+    var two_css = {
+        'left': Math.sin(two_start * 0.0075) * 200 ,
+        'top': Math.cos(two_start * 0.0075) * 200
+    }
+    two.css(two_css);
+}
+    
+</script>

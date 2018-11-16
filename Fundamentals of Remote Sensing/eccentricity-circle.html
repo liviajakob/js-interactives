@@ -1,0 +1,69 @@
+<svg height="500" width="500" xmlns="http://www.w3.org/2000/svg">
+  
+    <ellipse id="ecc" cx="200" cy="200" rx="100" ry="100"/>
+    <text id="ecc-text" x="200" y="200" text-anchor="middle" stroke="cornflowerblue" dy=".3em">Drag on the circle</text>
+    <ellipse class="drag" onclick="clicked(evt)" onmousemove="checkMouseDown(evt)" cx="200" cy="200" rx="100" ry="100"/>
+        
+
+</svg>
+
+<script>
+    
+    /*Handle if mouse clicked for drag and drop*/
+    var mouseDown = 0;
+    document.body.onmousedown = function() { 
+      ++mouseDown;
+    }
+    document.body.onmouseup = function() {
+      --mouseDown;
+    }
+    
+    
+    function checkMouseDown(evt){
+        if(mouseDown){
+            clicked(evt)
+        }
+    }   
+    
+    function clicked(evt){
+        var e = evt.target;
+            var dim = e.getBoundingClientRect();
+            var y = evt.clientY - dim.top;
+            radius=Math.abs(100-y);
+            resize(radius);
+    }
+    
+    function resize(radius){
+        ellipse = document.getElementById('ecc');
+        ellipse.setAttribute('ry', radius);
+        a=100
+        c=Math.sqrt(a*a - radius*radius)
+        text=document.getElementById('ecc-text');
+        ecc = parseFloat(Math.round(c/a * 1000) / 1000).toFixed(3);
+        text.textContent = 'Eccentricity: ' + ecc;
+    }
+    
+
+        
+    
+</script>
+
+<style>
+    .drag{
+        cursor: pointer;
+        fill: transparent;
+    }
+    #ecc{
+        fill: aliceblue;
+        stroke: cornflowerblue;
+        stroke-width: 2;
+    }
+    
+    
+::selection {
+  background: transparent; /* WebKit/Blink Browsers */
+}
+::-moz-selection {
+  background: transparent; /* Gecko Browsers */
+}
+</style>
