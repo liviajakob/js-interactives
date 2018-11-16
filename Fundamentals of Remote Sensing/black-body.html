@@ -16,7 +16,6 @@ Change Temperature: <br> <input id="logslider" type="range" style="width: 300px;
 <script>
     
     function updateTextInput(val) {
-        console.log(val);
         if (document.getElementById('textInput').value!=val){
             document.getElementById('textInput').value=val; 
         }else if (document.getElementById('logslider').value!=val){
@@ -178,7 +177,6 @@ function updateData(T) {
     chart.data.labels.pop();
     chart.data.datasets.forEach((dataset) => {
         if(dataset.label === "Planck Function"){
-            console.log(dataset);
             for (u = 0; u < 3000; u = u+1) {
                 dataset.data.pop();
             }
