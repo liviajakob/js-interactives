@@ -1,0 +1,116 @@
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+
+<svg id="svg-graph" height="350" width="600" xmlns="http://www.w3.org/2000/svg">
+  
+    <defs>
+        <marker id="arrow" markerWidth="13" markerHeight="13" refx="2" refy="6" orient="auto">
+            <path d="M2,2 L2,11 L10,6 L2,2" style="fill:darkred;" />
+        </marker>
+    </defs>
+
+        <rect x="200" y="100" width="100" height="200" style="fill:lightblue;stroke-width:3;stroke:cornflowerblue" />
+        <rect x="300" y="100" width="100" height="200" style="fill:lightblue;stroke-width:3;stroke:cornflowerblue" />
+        <path d="M50,200 L150,200"
+          style="stroke:darkred; stroke-width: 1.5px; fill: none;
+                 marker-end: url(#arrow);"
+        />
+        <path d="M50,200 L450,200"
+          style="stroke:darkred; stroke-width: 1.5px; fill: none;
+                 marker-end: url(#arrow);"
+        />
+        <path d="M50,200 L550,200"
+          style="stroke:darkred; stroke-width: 1.5px; fill: none;"
+        />
+        
+        <text text-anchor="left" stroke="darkred" dy=".3em" style='font-weight: 100; font-size: 16px;'>
+            <tspan x="50" y="145">Initial beam</tspan>
+            <tspan x="50" y="170">strength: </tspan><tspan id="initial-beam-value" >XX</tspan>
+        </text>
+        <text text-anchor="left" stroke="darkred" dy=".3em" style='font-weight: 100; font-size: 16px;'>
+            <tspan x="430" y="145">Outgoing beam</tspan>
+            <tspan x="430" y="170">strength: </tspan><tspan id="outgoing-beam-value">XX</tspan>
+        </text>
+        <text text-anchor="left" dy=".3em" style='font-weight: 400; font-size: 16px;'>
+            <tspan  x="190" y="55">Beam strength at 50 m: </tspan><tspan id="50m-beam">XX</tspan>
+        </text>
+
+</svg>
+<div style="color: cornflowerblue" id="abs-input">
+0 <input id="abs-coeff-slider" type="range" style="width: 250px; margin: 15px;" name="Pressure" min="0" max="100" value="0" oninput="updateData();"> 0.01<br>
+    <p style="color: cornflowerblue; margin-left: 30px;">Absorption coefficient: <span id="abs-coeff-value">XX</span>/m</p>
+</div>
+
+<div style="color: darkred" id="beam-input">
+    <span style="vertical-align: top;">1</span><br>0.1 <input id="initial-beam-slider" type="range" style="width: 30px; height: 200px; margin-left: 5px; margin-top: -20px;" name="Pressure" min="10" max="100" value="10" oninput="updateData();" orient="vertical">
+</div>
+
+<script>
+    
+    updateData();
+    
+    /*Function to update data on input*/
+    function updateData() {
+        updateTextInput();
+        calculateOutput();
+    }
+
+    function updateTextInput() {
+        abscoeff=document.getElementById('abs-coeff-slider').value/10000
+        if (document.getElementById('abs-coeff-value').innerHTML!=abscoeff){
+            document.getElementById('abs-coeff-value').innerHTML=abscoeff; 
+        }
+        initialbeam = document.getElementById('initial-beam-slider').value/100
+        if (document.getElementById('initial-beam-value').textContent!=initialbeam){
+            document.getElementById('initial-beam-value').textContent=initialbeam; 
+        }
+        
+    }
+    
+    /*Calculates beam strength at 50m and outgoing beam and inserts it*/
+    function calculateOutput(){
+        abscoeff=document.getElementById('abs-coeff-slider').value/10000
+        initialbeam = document.getElementById('initial-beam-slider').value/100
+        outgoing = initialbeam*Math.exp(-100*abscoeff)
+        fiftym = initialbeam*Math.exp(-(abscoeff*50))
+        //parse to three decimals
+        fiftym = parseFloat(Math.round(fiftym * 1000) / 1000).toFixed(3);
+        outgoing = parseFloat(Math.round(outgoing * 1000) / 1000).toFixed(3);
+        document.getElementById('outgoing-beam-value').textContent=outgoing; 
+        document.getElementById('50m-beam').textContent=fiftym; 
+    }
+        
+    
+</script>
+
+<style>
+    #abs-input{
+        position: absolute;
+        left: 245px;
+        top: 340px;
+        
+    }
+    #beam-input{
+        position: absolute;
+        left: 60px;
+        top: 95px;
+        
+    }
+    
+    #svg-graph{
+        position: absolute;
+        left: 100px;
+        top: 10px;
+    }
+    
+    
+    
+    input[type=range][orient=vertical]
+{
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* WebKit */
+    width: 8px;
+    height: 175px;
+    padding: 0 5px;
+}
+</style>

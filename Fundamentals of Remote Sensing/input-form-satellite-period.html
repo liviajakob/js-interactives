@@ -1,0 +1,36 @@
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+<div class="container" style="margin-top: 20px; padding:20px; border-radius:10px; background-color: aliceblue">
+    <p><bold>Enter satellite height (in km) to get satellite period (assuming equatorial radius and zero eccentricity):</bold></p>
+    <div>Satellite height: <input id="height" class="form-control" type="number" step="0.01" style="width: 150px; margin-bottom:15px; display: inline; padding-top: 2px;"> km &nbsp; &nbsp; &nbsp;<button class="btn btn-primary" onclick="calculate()">Calculate Period</button></div>
+    <hr><hr>
+    <p id="result"></p>
+</div>
+
+
+<script>
+    
+    //definitions
+    var GMe = 3.9860095*Math.pow(10,14);
+    var re = 6378137.0;
+    
+    
+    // calculates period
+    function calculate(){
+        h = document.getElementById('height').value
+        if (h>0){
+            r = h * 1000 + re;
+            T = Math.sqrt(4*Math.PI*Math.PI*r*r*r/GMe);
+            hr = Math.floor(T/3600);
+            m1 = Math.floor(T/60);
+            m = m1 - hr*60;
+            s = Math.floor(T) - m1*60;
+            s2 = "Period = "+hr+" h, "+m+" min, "+s+" s";
+            document.getElementById('result').innerHTML = s2;
+        }else{
+            document.getElementById('result').innerHTML = 'No valid height given!';
+        }
+        
+    }
+    
+</script>
