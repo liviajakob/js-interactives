@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/maphilight/1.4.0/jquery.maphilight.min.js"></script>
+</head>
+<body>
+<div style="margin: 40px">
+    
+ 
+<img src="img/scat.gif" width="408" alt="Electromegnetic spectrum"
+usemap="#scattering" class="map" style="float: left;">
+<div class="info" id="info">
+   
+</div>
+    
+    
+<map name="scattering">
+    <area id="geom" alt="Geometric Optics" title="Geometric Optics" coords="302,7,67,186,67,6" shape="poly" onmouseover="displayInfo(this)">
+    <area id="mie" alt="Mie" title="Mie" href="" coords="67,188,67,286,400,36,400,6,306,6" shape="poly" onmouseover="displayInfo(this)">
+    <area id="ray" alt="Rayleigh" title="Rayleigh" coords="67,288,402,37,400,114,113,329,67,327" shape="poly" onmouseover="displayInfo(this)">
+    <area id="neg" alt="Negligible Scattering" title="Negligible Scattering" coords="116,329,401,327,401,116" shape="poly" onmouseover="displayInfo(this)">
+</map>
+
+</div>
+
+
+
+<script>
+    
+info='<div class="init"><h4>Scattering</h4><p>Hover over the areas in the graph to display information about the scattering regime!</p></div>'
+document.getElementById('info').innerHTML = info;    
+   
+    function displayInfo(ele){
+        html = "<img src='img/"+ele.id+".gif' height='320'>"
+        document.getElementById('info').innerHTML = html
+    }
+    
+    
+    
+    /*Overwriting settings for highlighting*/
+    $.fn.maphilight.defaults = {
+        fill: true,
+        fillColor: '000000',
+        fillOpacity: 0.1,
+        stroke: false,
+        strokeColor: 'black',
+        strokeOpacity: 3,
+        strokeWidth: 1,
+        fade: true,
+        alwaysOn: false,
+        neverOn: false,
+        groupBy: false,
+        wrapClass: true,
+        shadow: true,
+        shadowX: 0,
+        shadowY: 0,
+        shadowRadius: 6,
+        shadowColor: '000000',
+        shadowOpacity: 0.7,
+        shadowPosition: 'outside',
+        shadowFrom: false
+}
+    
+    /*Highlight map*/
+      $(function() {
+        $('.map').maphilight();
+      })
+    
+
+</script>
+    
+       
+<style>
+
+    
+    
+    .info{
+        position: absolute;
+        left: 500px;
+        top: 50px;
+    }
+    
+    .info .init{
+        width: 175px;
+        padding: 20px;
+        border-radius:25px; 
+        background-color: aliceblue;
+        height:320px;
+        border-bottom-color: black;
+        border-style: solid;
+    }
+    
+    
+    
+</style>
+    
+</body>
+</html>
