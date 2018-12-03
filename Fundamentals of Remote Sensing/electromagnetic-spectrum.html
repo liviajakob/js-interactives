@@ -1,0 +1,162 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div style="margin: 40px">
+    
+    
+<img src="img/electromagneticspectrum.jpg" height="300" alt="Electromegnetic spectrum"
+usemap="#spectrum">
+
+<map name="spectrum">
+  <area id="gamma" shape="rect" coords="0,0,70,300" onmouseover="displayInfo(this)" onmouseout="hideInfo(this)" alt="Gamma Rays">
+    <area id="xrays" shape="rect" coords="70,0,170,300" onmouseover="displayInfo(this)" onmouseout="hideInfo(this)" alt="X Rays">
+    <area id="uv" shape="rect" coords="170,0,265,300" onmouseover="displayInfo(this)" onmouseout="hideInfo(this)" alt="Ultraviolet">
+    <area id="vis" shape="rect" coords="260,0,290,300" onmouseover="displayInfo(this)" onmouseout="hideInfo(this)" alt="Visible Light">
+    <area id="ir" shape="rect" coords="290,0,400,300" onmouseover="displayInfo(this)" onmouseout="hideInfo(this)" alt="Infrared">
+    <area id="mw" shape="rect" coords="400,0,540,300" onmouseover="displayInfo(this)" onmouseout="hideInfo(this)" alt="Microwave">
+    <area id="rw" shape="rect" coords="540,0,660,300" onmouseover="displayInfo(this)" onmouseout="hideInfo(this)" alt="Radiowave">
+</map>
+  
+    <div class="bar gamma" type="top"></div>
+    <div class="bar gamma" type="bottom"></div>
+    <div class="bar xrays" type="top"></div>
+    <div class="bar xrays" type="bottom"></div>
+    <div class="bar uv" type="top"></div>
+    <div class="bar uv" type="bottom"></div>
+    <div class="bar vis" type="top"></div>
+    <div class="bar vis" type="bottom"></div>
+    <div class="bar ir" type="top"></div>
+    <div class="bar ir" type="bottom"></div>
+    <div class="bar mw" type="top"></div>
+    <div class="bar mw" type="bottom"></div>
+    <div class="bar rw" type="top"></div>
+    <div class="bar rw" type="bottom"></div>
+
+    <div id="info"></div>
+</div>
+
+
+
+<script>
+    
+    
+gamma="<h3>Gamma Rays</h3><p>The shortest wavelength, and hence the highest energy, radiation band, gamma rays are the product of radioactive decay. Their high energies make them extremely dangerous to life.</p>"
+xrays="<h3>X-Rays</h3><p>X-rays have short wavelengths, ranging approximately between 10<sup>-6</sup> and 10<sup>-2</sup> microns. Although they are chiefly associated with medical imaging, exposure to X-rays is strictly limited on safety grounds.</p>"
+uv = "<h3>Ultraviolet Radiation</h3><p>Ultraviolet rays possess wavelengths of between 0.01 and 0.4 microns. UV radiation is emitted by the Sun, and, although they are mostly absorbed in the upper atmosphere, solar UV rays can cause skin cancer.</p>"
+vis = "<h3>Visible Light</h3><p>The wavelength range which can be sensed by the human eye is extremely narrow, lying between 0.4 and 0.7 microns. Wavelengths in the range 0.5-0.7 microns are very commonly used in remote sensing.</p>"
+ir = "<h3>Infrared Radiation</h3><p>The infrared bank stretches from 0.7 to 100 microns. Useful areas for remote sensing are the 'very near' (0.7-1.2 microns) and the 'thermal' (10-12 microns) infrared, though there are other important regions.</p>"
+mw = "<h3>Microwaves</h3><p>The microave spectral region lies in the wavelength range 10<sup>-4</sup> - 1 metres. Microwaves are useful for remote sensing due to their ability to penetrate cloud. Microwave radar has many applications.</p>"
+rw = "<h3>Radio Waves</h3><p>Radio waves are defined as having a wavelength greater than 1 metre. Their low energy means that generation and broadcast of radio waves is easy, making them ideal for communication.</p>"
+info='<h5>Hover over the electromagnetic spectrum to display information about the wavelength!</h5>'
+document.getElementById('info').innerHTML = info;    
+    
+infos = {"gamma":gamma, 'xrays': xrays, 'uv': uv, 'vis': vis, 'ir': ir, 'mw': mw, 'rw': rw}    
+    
+    
+    function displayInfo(ele){
+        document.getElementById('info').innerHTML = infos[ele.id]
+        els = document.getElementsByClassName(ele.id)
+        Array.prototype.forEach.call(els, function(el) {
+            el.style.display = 'block';
+        });
+    }
+    
+    function hideInfo(ele){
+        document.getElementById('info').innerHTML = info;
+        els = document.getElementsByClassName(ele.id)
+        Array.prototype.forEach.call(els, function(el) {
+            console.log(el.tagName);
+            el.style.display = 'none';
+        });
+    }
+    
+    
+
+</script>
+    
+    
+    
+<style>
+    
+    .gamma{
+        width: 60px; 
+        left: 50px; 
+    } 
+
+    .xrays{
+        width: 100px; 
+        left: 110px; 
+        }
+
+    .uv{
+        width: 90px; 
+        left: 210px; 
+        }
+
+    .vis{
+        width: 30px; 
+        left: 300px; 
+        }
+
+    .ir{
+        width: 110px; 
+        left: 330px; 
+        }
+
+    .mw{
+        width: 140px; 
+        left: 440px; 
+        }
+
+    .rw{
+        width: 120px; 
+        left: 580px; 
+        }
+
+
+    
+    .bar{
+        position:absolute; 
+        display: none;
+        background-color:#0CC;
+        height: 10px; 
+    }
+    
+    .bar[type=top]{
+        top:30px; 
+    }
+    
+    .bar[type=bottom]{
+        top:350px; 
+    }
+    
+     
+    .bar[type=bottom].vis{
+        width: 300px; 
+        left: 170px;
+    }
+    
+    
+    #info{
+        position: absolute;
+        margin-top: 50px; 
+        padding:20px; 
+        border-radius:10px; 
+        background-color: aliceblue;
+        width: 680px;
+        height: 160px;
+    }
+    
+    
+    
+</style>
+    
+</body>
+</html>
