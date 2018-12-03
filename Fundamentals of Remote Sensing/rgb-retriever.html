@@ -14,7 +14,6 @@
 <script>
 var img = new Image(60, 45);   // Using optional size for image
 img.onload = drawImage; // Draw when image has loaded
-// load an image of intrinsic size 300x227 in CSS pixels
 img.src = 'img/corba.jpg';
 
 /*Draw image as canvas so that RGB values can be queried*/
@@ -27,7 +26,6 @@ function drawImage() {
     
 /*Gets values of cursor position when clicked*/
 function getCursorPosition(event) {
-    console.log(event)
     canvas = document.getElementById("rgbImg");
     ctx = canvas.getContext("2d");
     var rect = canvas.getBoundingClientRect();

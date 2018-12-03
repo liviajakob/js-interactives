@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+</head>
+<body>    
+
+<div class="info-outer">
+<div class="info">   
+<select class="form-control" id="orbits" onchange="getOrbit()">
+  <option value="" selected disabled>Select Orbit</option>
+  <option value="sunsynchronous">Sunsynchronous</option>
+  <option value="geostationary">Geostationary</option>
+  <option value="geosynchronous">Geosynchronous</option>
+</select>
+</div>
+</div>
+    
+<canvas id="mapCanvas" width="512" height="256"></canvas>
+<canvas id="orbitCanvas" width="512" height="256">
+    
+Your browser does not support the HTML5 canvas tag.</canvas>
+
+<script>
+    
+var GMe = 3.9860095e14;
+var ree = 6378137.0;
+var J2 = 0.00108263;
+var t0=0;
+var num = 3;
+var orbit = createNdArray(900, 2)
+drawMap();
+    
+/*draws the canavas background map*/    
+function drawMap(){
+    mc = document.getElementById("mapCanvas");
+    mctx = mc.getContext("2d");
+    //draw background map
+    background = new Image();
+    background.src = "img/map.gif";
+
+    // Make sure the image is loaded first otherwise nothing will draw.
+    background.onload = function(){
+        mctx.drawImage(background,0,0);   
+    }
+}
+
+    
+/*Creates a n-dimensional array; length is a list with the dimensions*/
+function createNdArray(length) {
+    var arr = new Array(length || 0),
+        i = length;
+
+    if (arguments.length > 1) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        while(i--) arr[length-1 - i] = createNdArray.apply(this, args);
+    }
+
+    return arr;
+}
+
+
+function getOrbit(){
+    inp = document.getElementById("orbits").value;
+    if(inp==="sunsynchronous"){
+		    a = 7076000.0;
+		    e = 0.0;
+		    i = 98.2*Math.PI/180.0;
+            calculateOrbit(a,e,i);
+		}
+		else if(inp=="geostationary"){
+		    a = 42168000.0;
+		    e = 0.00;
+		    i = 0.00;
+            calculateOrbit(a,e,i);
+		}
+		else if(inp=="geosynchronous"){
+		    a = 42168000.0;
+		    e = 0.00;
+		    i = 60.0*Math.PI/180.0;
+            calculateOrbit(a,e,i);
+		}
+    drawOrbit();
+       
+}
+    
+    
+/* Draws the orbits onto the map */
+function drawOrbit(){
+    c = document.getElementById("orbitCanvas");
+    ctx = c.getContext("2d");
+    ctx.lineWidth=4;
+    ctx.lineCap = 'round'
+    ctx.strokeStyle="darkred";
+    // clear previous orbit
+    ctx.clearRect(0,0,600,300);    
+    for(var j=1; j<(300*num); j++) {
+	    if(Math.abs(orbit[j-1][1]-orbit[j][1]) < 100) {
+		//g.drawLine(orbit[j-1][1],orbit[j-1][0],orbit[j][1],orbit[j][0]);
+            ctx.beginPath();
+            ctx.moveTo(orbit[j-1][1],orbit[j-1][0]);
+            ctx.lineTo(orbit[j][1],orbit[j][0]);
+            ctx.stroke();
+	    }
+	}
+    
+    ctx.stroke();
+}
+    
+    
+    
+    
+function calculateOrbit(a, e, i){
+    /*Set to zero*/
+    for(var j=0; j<900; j++) {
+	    orbit[j][0] = 0;
+	    orbit[j][1] = 0;
+	}
+	k = 300*num;
+	t = 0;
+	w = 0;
+	Om = 0;
+	tp = 0;
+	n = Math.sqrt(GMe/Math.pow(a,3));
+	T = 2*Math.PI/n;
+	step = T/300;
+	temp = 1.5*J2*Math.pow(ree/a,2);
+	Mdot = n*(1+temp*Math.pow(1-e*e,-1.5)*(1-1.5*Math.sin(i)*Math.sin(i)));
+	Omdot = -Mdot*(temp*Math.pow(1-e*e,-2.0)*Math.cos(i));
+	wdot = Mdot*(temp*Math.pow(1-e*e,-2.0)*(2-2.5*Math.sin(i)*Math.sin(i)));
+	for(j=0; j<k; j++){
+	    w0 = w;
+	    Om0 = Om;
+	    t += step;
+
+	    //Solve Kepler's equation
+	    M = n*(t-tp);
+	    ea = M;
+	    do {
+		del = ea-e*Math.sin(ea)-M;
+		if(del == 0.0){
+		    delea = 0.0;
+		}
+		else delea = del/(1-e*Math.cos(ea));
+		ea -= delea;
+	    } while(del > 1.0e-6);
+
+	    theta = Math.acos((Math.cos(ea)-e)/(1-e*Math.cos(ea)));
+	    if((j >= 150) && (j < 300)){
+		  theta = 2.0*Math.PI-theta;
+	    }
+	    if((j >= 450) && (j < 600)) {
+		  theta = 2.0*Math.PI-theta;
+	    }
+	    if((j >= 750) && (j < 900)) {
+		  theta = 2.0*Math.PI-theta;
+	    }
+	    r = (a*(1-e*e))/(1+e*Math.cos(theta));
+	    x = r*Math.cos(theta);
+	    y = r*Math.sin(theta);
+	    z=0;
+	    w = w0+wdot*(t-t0);
+	    Om = Om0+Omdot*(t-t0);
+	    x1 = x*Math.cos(w)-y*Math.sin(w);
+	    y1 = x*Math.sin(w)+y*Math.cos(w);
+	    z1 = z;
+	    x2 = x1;
+	    y2 = y1*Math.cos(i)-z1*Math.sin(i);
+	    z2 = y1*Math.sin(i)+z1*Math.cos(i);
+	    x3 = x2*Math.cos(Om)-y2*Math.sin(Om);
+	    y3 = x2*Math.sin(Om)+y2*Math.cos(Om);
+	    z3 = z2;
+	    lat = Math.asin(z3/r);
+	    if((y3 < 0) && (x3 < 0)) {
+		  ra = Math.atan(y3/x3)-Math.PI;
+	    }
+	    else if((x3 < 0) && (y3 >= 0)) {
+		  ra = Math.atan(y3/x3)+Math.PI;
+	    }
+	    else ra = Math.atan(y3/x3);
+        
+	    lon = ra-t*Math.PI*2.0/86400.0;
+	    if(lon < -Math.PI){
+		  lon = lon+Math.PI*2.0;
+	    }
+	    orbit[j][0] = Math.floor(-lat*180*1.333/Math.PI+157.0);
+	    orbit[j][1] = Math.floor(lon*180*1.333/Math.PI+285.0);
+	    t0 = t;
+	}
+}
+
+
+</script>
+    
+<style>
+    
+    #orbitCanvas{
+        background-color: transparent;
+        border:1px solid #d3d3d3; 
+        position: absolute; 
+        left: 30px; 
+        top: 30px; 
+        z-index: 1;
+        border-radius: 20px;
+    }
+    
+    #mapCanvas{
+        border:1px solid #d3d3d3; 
+        position: absolute; 
+        left: 30px; 
+        top: 30px; 
+        z-index: 0;
+        
+        border-radius: 20px;
+    }
+    
+    
+    .info{
+        position: absolute;
+        left: 120px; 
+        top: 290px;
+        width: 300px;
+    }
+    
+    .info-outer{
+        position: absolute;
+        left: 20px;
+        top: 20px;
+        background-color: aliceblue;
+        border-radius: 20px;
+        height: 350px;
+        width: 535px;
+    }
+    
+</style>
+    
+</body>
+</html>
+
