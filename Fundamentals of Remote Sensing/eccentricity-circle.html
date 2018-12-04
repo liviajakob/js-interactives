@@ -2,47 +2,41 @@
 
 
 <svg height="500" width="500" xmlns="http://www.w3.org/2000/svg">
-  
     <ellipse id="ecc" cx="200" cy="200" rx="100" ry="100"/>
     <text id="ecc-text" x="200" y="200" text-anchor="middle" stroke="cornflowerblue" dy=".3em">Drag on the circle</text>
-    <ellipse class="drag" onclick="clicked(evt)" onmousemove="checkMouseDown(evt)" cx="200" cy="200" rx="100" ry="100"/>
-        
-
+    <rect class="drag" onmousedown="clicked(evt)" width="200" height="200" x="100" y="100"/>
 </svg>
 
 <script>
     
-    /*Handle if mouse clicked for drag and drop*/
-    var mouseDown = 0;
-    document.body.onmousedown = function() { 
-      ++mouseDown;
-    }
-    document.body.onmouseup = function() {
-      --mouseDown;
-    }
-    
-    
-    function checkMouseDown(evt){
-        if(mouseDown){
-            clicked(evt)
-        }
-    }   
-    
+    var offset = 100; //offset from top of page
+    var maxRad = 100; //max radius, ie radius uf circle
+    document.addEventListener('mouseup', released);
+        
     function clicked(evt){
-        var e = evt.target;
-            var dim = e.getBoundingClientRect();
-            var y = evt.clientY - dim.top;
-            radius=Math.abs(100-y);
-            resize(radius);
+        document.addEventListener('mousemove', handleMove);
+        handleMove(evt);
+    }
+    
+    function released(){
+        document.removeEventListener('mousemove', handleMove);
+    }
+    
+    function handleMove(evt){
+        var y = evt.pageY - offset;
+        radius=Math.abs(100-y);
+        if (radius>100){
+            radius=100;
+        }
+        resize(radius);
     }
     
     function resize(radius){
         ellipse = document.getElementById('ecc');
         ellipse.setAttribute('ry', radius);
-        a=100
-        c=Math.sqrt(a*a - radius*radius)
+        c=Math.sqrt(maxRad*maxRad - radius*radius)
         text=document.getElementById('ecc-text');
-        ecc = parseFloat(Math.round(c/a * 1000) / 1000).toFixed(3);
+        ecc = parseFloat(Math.round(c/maxRad * 1000) / 1000).toFixed(3);
         text.textContent = 'Eccentricity: ' + ecc;
     }
     

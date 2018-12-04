@@ -8,13 +8,30 @@
 <body>    
 
 <div class="info-outer">
-<div class="info">   
-<select class="form-control" id="orbits" onchange="getOrbit()">
-  <option value="" selected disabled>Select Orbit</option>
-  <option value="sunsynchronous">Sunsynchronous</option>
-  <option value="geostationary">Geostationary</option>
-  <option value="geosynchronous">Geosynchronous</option>
-</select>
+<div class="info"> 
+<table class="table table-borderless table-sm">
+    <tr>
+      <td>Semimajor axis</td>
+      <td>Eccentricity</td>
+      <td>Inclination angle</td>
+      <td>Number of orbits</td>
+    </tr>
+  <tbody>
+    <tr>
+      <td><input id="axis" class="form-control" type="number" step="0.01" value="7229.6" style="width: 110px;"></td>
+      <td><input id="ecc" class="form-control" type="number" step="0.01" value="0.0012" style="width: 110px;"></td>
+      <td><input id="inc" class="form-control" type="number" step="0.01" value="98.97" style="width: 110px;"></td>
+      <td>
+        <select class="form-control" id="num">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select>
+        </td>
+    </tr>
+  </tbody>
+</table><button class="btn btn-primary" style="margin-left: 38%; padding-left: 30px; padding-right: 30px; margin-bottom: 10px;" onclick="getOrbit()">Apply</button>
+    <div><p id="error-msg" style="color: darkred; margin-left: 10px;"></p></div>
 </div>
 </div>
     
@@ -24,13 +41,13 @@
 Your browser does not support the HTML5 canvas tag.</canvas>
 
 <script>
-    
+
+//definitions
 var GMe = 3.9860095e14;
 var ree = 6378137.0;
 var J2 = 0.00108263;
 var t0=0;
-var num = 3;
-var orbit = createNdArray(900, 2)
+var orbit;
 drawMap();
     
 /*draws the canavas background map*/    
@@ -62,33 +79,45 @@ function createNdArray(length) {
 }
 
 
+/*Initiates orbit calculation and drawing of the orbit*/
 function getOrbit(){
-    inp = document.getElementById("orbits").value;
-    if(inp==="sunsynchronous"){
-		    a = 7076000.0;
-		    e = 0.0;
-		    i = 98.2*Math.PI/180.0;
-            calculateOrbit(a,e,i);
-		}
-		else if(inp=="geostationary"){
-		    a = 42168000.0;
-		    e = 0.00;
-		    i = 0.00;
-            calculateOrbit(a,e,i);
-		}
-		else if(inp=="geosynchronous"){
-		    a = 42168000.0;
-		    e = 0.00;
-		    i = 60.0*Math.PI/180.0;
-            calculateOrbit(a,e,i);
-		}
-    drawOrbit();
-       
+    a = document.getElementById("axis").value;
+    e = document.getElementById("ecc").value;
+    i = document.getElementById("inc").value;
+    num = parseInt(document.getElementById("num").value);
+    if(a.length==0 || e.length==0 || i.length==0){
+        handleWrongInput("Please fill out all input fields.")
+        return
+    }
+    // convert inputs accordingly
+    a=a*1000;
+    i=i*Math.PI/180.0;
+    e=parseFloat(e);
+    
+    if((a*Math.sqrt(1-e*e)) > ree){ //test if input is valid
+        orbit = createNdArray(300*num, 2)
+        document.getElementById("error-msg").innerHTML="";
+        calculateOrbit(a,e,i, num);
+        drawOrbit(num);
+    
+    }else{
+        handleWrongInput("Sorry, this orbit is not permitted. The satellite would pass through the Earth.")
+    }   
+}
+    
+
+/* Cleans the map and displays a error message (msg) */
+function handleWrongInput(msg){
+        c = document.getElementById("orbitCanvas");
+        ctx = c.getContext("2d");
+        ctx.clearRect(0,0,600,300);
+        document.getElementById("error-msg").innerHTML=msg;
+    
 }
     
     
 /* Draws the orbits onto the map */
-function drawOrbit(){
+function drawOrbit(num){
     c = document.getElementById("orbitCanvas");
     ctx = c.getContext("2d");
     ctx.lineWidth=4;
@@ -97,7 +126,8 @@ function drawOrbit(){
     // clear previous orbit
     ctx.clearRect(0,0,600,300);    
     for(var j=1; j<(300*num); j++) {
-	    if(Math.abs(orbit[j-1][1]-orbit[j][1]) < 100) { //check this for edge cases
+	    if(Math.abs(orbit[j-1][1]-orbit[j][1]) < 100) {//check this for edge cases
+            //draw line
             ctx.beginPath();
             ctx.moveTo(orbit[j-1][1],orbit[j-1][0]);
             ctx.lineTo(orbit[j][1],orbit[j][0]);
@@ -110,8 +140,8 @@ function drawOrbit(){
     
     
     
-/*Calculates orbit an an 900x2 array with X and Y values representing the path of the orbit*/    
-function calculateOrbit(a, e, i){
+/*Calculates orbit an an (300*number_of_orbits) two-dimensional array with X and Y values representing the path of the orbit*/
+function calculateOrbit(a, e, i, num){
     /*Set to zero*/
     for(var j=0; j<(300*num); j++) {
 	    orbit[j][0] = 0;
@@ -218,9 +248,9 @@ function calculateOrbit(a, e, i){
     
     .info{
         position: absolute;
-        left: 120px; 
+        left: 15px; 
         top: 290px;
-        width: 300px;
+        width: 505px;
     }
     
     .info-outer{
@@ -229,8 +259,17 @@ function calculateOrbit(a, e, i){
         top: 20px;
         background-color: aliceblue;
         border-radius: 20px;
-        height: 350px;
+        height: 490px;
         width: 535px;
+    }
+    
+    table{
+        font-size: 14px;
+    }
+    
+    .table-borderless td,
+    .table-borderless th {
+        border: 0;
     }
     
 </style>
