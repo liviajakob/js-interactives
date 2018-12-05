@@ -50,7 +50,7 @@ var ree = 6378137.0;
 var J2 = 0.00108263;
 var t0=0;
 var orbit;
-var num=3;
+var num=1;
 drawMap();
 updateTextInput(document.getElementById('axis'));
 setInclination(0.000);
@@ -59,7 +59,6 @@ setInclination(0.000);
 function updateTextInput(ele) {
         id = ele.id+'-t';
         val=ele.value;
-        console.log(id, val)
         if (document.getElementById(id).value!=val){
             document.getElementById(id).innerHTML=val; 
         }
@@ -101,13 +100,12 @@ function getOrbit(ele){
     a = document.getElementById("axis").value*1000;
     e = parseFloat(document.getElementById("ecc-text").innerHTML.substring(4));
     i = document.getElementById("inc-t").innerHTML*Math.PI/180.0;
-    console.log(document.getElementById("ecc-text").innerHTML.substring(4));
-    console.log(a,e,i);
-    console.log((a*Math.sqrt(1-e*e)))
     if((a*Math.sqrt(1-e*e)) > ree){ //test if input is valid
         orbit = createNdArray(300*num, 2)
         calculateOrbit(a,e,i);
         drawOrbit();
+    }else{
+        console.log('Orbit not permitted');
     }  
 }
     
@@ -254,7 +252,6 @@ function calculateOrbit(a, e, i){
         
     function handleEccMove(evt){
         var yOffset = $('#ecc-svg').offset().top
-        console.log("yOffset ",yOffset);
         var y = evt.pageY - yOffset;
         radius=Math.abs(60-y);
         if (radius>maxRad){
@@ -285,7 +282,6 @@ function calculateOrbit(a, e, i){
         var y = evt.pageY - yOffset;
         var x = evt.pageX - xOffset;
         angle = calcAngle(x, y);
-        console.log("angle ",angle);
         transformInc(angle);
         setInclination(angle);
         getOrbit(); //update the orbit
