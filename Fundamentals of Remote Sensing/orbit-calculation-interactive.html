@@ -8,29 +8,34 @@
 <body>    
 
 <div class="info-outer">
-<div class="info"> 
-<table class="table table-borderless">
-    <tr>
-        <td><b>Eccentricity</b></td>
-      <td><b>Inclination angle</b></td>
-        <td><b>Semimajor axis</b></td>
-    </tr>
-  <tbody>
-    <tr>
-      <td>
-          <svg id="svg" viewBox="99 99 250 250" xmlns="http://www.w3.org/2000/svg">
-            <ellipse id="ecc" cx="200" cy="200" rx="100" ry="100"/>
-            <text id="ecc-text" x="200" y="200" text-anchor="middle" stroke="cornflowerblue" dy=".3em">Drag on the circle</text>
-            <rect class="drag" onmousedown="clicked(evt)" width="200" height="200" x="100" y="100"/>
-        </svg>
-        </td>
-      <td><input id="inc" class="form-control" type="number" step="0.01" value="98.97" style="width: 110px;"></td>
-        <td>a = <span id="axis-t"></span> km<br><input id="axis" type="range" name="Semimajor axis" min="7228" max="41733" value="7228" oninput="getOrbit(this);"></td>
-    </tr>
-  </tbody>
-</table><button class="btn btn-primary" style="margin-left: 38%; padding-left: 30px; padding-right: 30px; margin-bottom: 10px;" onclick="getOrbit()">Apply</button>
 </div>
+    
+<div id="ecc-outer" class="outer">
+    <b>Eccentricity</b>
+    
 </div>
+<div id="inc-outer" class="outer">
+    <b>Inclination angle</b>
+    <p>i = <span id="inc-t">98.97</span></p>
+</div>
+<div id="axis-outer" class="outer">
+    <b>Semimajor axis</b>
+    <p>
+        a = <span id="axis-t"></span> km </p><br><input id="axis" type="range" name="Semimajor axis" min="7228" max="41733" value="7228" oninput="getOrbit(this);" style="width: 100%;">
+</div>
+
+<svg id="ecc-svg" width="130" height="130" xmlns="http://www.w3.org/2000/svg">
+            <ellipse id="ecc" cx="61" cy="61" rx="60" ry="60"/>
+            <text id="ecc-text" x="60" y="60" text-anchor="middle" dy=".3em"></text>
+            <rect id="ecc-drag" class="drag" onmousedown="clicked(evt)" width="120" height="120" x="0" y="0"/>
+</svg>
+    
+<svg id="inc-svg" width="130" height="130" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="55" r="15" style="fill: cornflowerblue;"/>
+            <line id="inc-line" x1="10" y1="55" x2="110" y2="55"/>
+            <rect id="inc-drag" class="drag" onmousedown="clicked(evt)" width="120" height="120" x="0" y="0"/>
+</svg>
+    
     
 <canvas id="mapCanvas" width="512" height="256"></canvas>
 <canvas id="orbitCanvas" width="542" height="286">
@@ -45,11 +50,12 @@ var ree = 6378137.0;
 var J2 = 0.00108263;
 var t0=0;
 var orbit;
-var num=1;
+var num=3;
 drawMap();
 updateTextInput(document.getElementById('axis'));
-    
-    
+setInclination(0.000);
+
+/*Update tet input for ecc*/
 function updateTextInput(ele) {
         id = ele.id+'-t';
         val=ele.value;
@@ -93,9 +99,9 @@ function getOrbit(ele){
         updateTextInput(ele);
     }
     a = document.getElementById("axis").value*1000;
-    e = parseFloat(document.getElementById("ecc").value);
-    i = document.getElementById("inc").value*Math.PI/180.0;
-    
+    e = parseFloat(document.getElementById("ecc-text").innerHTML.substring(4));
+    i = document.getElementById("inc-t").innerHTML*Math.PI/180.0;
+    console.log(document.getElementById("ecc-text").innerHTML.substring(4));
     console.log(a,e,i);
     console.log((a*Math.sqrt(1-e*e)))
     if((a*Math.sqrt(1-e*e)) > ree){ //test if input is valid
@@ -225,40 +231,87 @@ function calculateOrbit(a, e, i){
     
 /* Eccentricity circle */
 /////////////////////////////////////////////////////////////
-    var offset = 320; //offset from top of page $('#ecc').position().top
-    console.log(offset);
-    var maxRad = 100; //max radius, ie radius of circle
+    
+    var maxRad = 60; //max radius, ie radius of circle
     document.addEventListener('mouseup', released);
-        
+    resizeEcc(maxRad); //initial resize
+    
     function clicked(evt){
-        document.addEventListener('mousemove', handleMove);
-        handleMove(evt);
+        if(evt.target.id==="ecc-drag"){
+            document.addEventListener('mousemove', handleEccMove);
+            handleEccMove(evt);
+        }else if(evt.target.id==="inc-drag"){
+            document.addEventListener('mousemove', handleIncMove);
+            handleIncMove(evt);
+        }
     }
     
     function released(){
-        document.removeEventListener('mousemove', handleMove);
+        document.removeEventListener('mousemove', handleEccMove);
+        document.removeEventListener('mousemove', handleIncMove);
     }
     
-    function handleMove(evt){
-        var y = evt.pageY - offset;
-        radius=Math.abs(100-y);
-        if (radius>100){
-            radius=100;
+        
+    function handleEccMove(evt){
+        var yOffset = $('#ecc-svg').offset().top
+        console.log("yOffset ",yOffset);
+        var y = evt.pageY - yOffset;
+        radius=Math.abs(60-y);
+        if (radius>maxRad){
+            radius=maxRad;
         }
-        resize(radius);
+        resizeEcc(radius);
+        getOrbit(); //update the orbit
     }
     
-    function resize(radius){
+    function resizeEcc(radius){
         ellipse = document.getElementById('ecc');
         ellipse.setAttribute('ry', radius);
         c=Math.sqrt(maxRad*maxRad - radius*radius)
         text=document.getElementById('ecc-text');
         ecc = parseFloat(Math.round(c/maxRad * 1000) / 1000).toFixed(3);
-        text.textContent = 'Eccentricity: ' + ecc;
+        text.textContent = 'e = ' + ecc;
+    }
+    
+    // end eccentricity circle
+    
+    
+    /////////Inclination Angle Interactive/////////////
+    
+    
+    function handleIncMove(evt){
+        var yOffset = $('#inc-svg').offset().top+55 //-55 to get center of
+        var xOffset = $('#inc-svg').offset().left+60 //-60 to get center of
+        var y = evt.pageY - yOffset;
+        var x = evt.pageX - xOffset;
+        angle = calcAngle(x, y);
+        console.log("angle ",angle);
+        transformInc(angle);
+        setInclination(angle);
+        getOrbit(); //update the orbit
+    }
+    
+    /*Calculates alpha angle from x and y of an rectangle with alpha = atan(h/p)*/
+    function calcAngle(x, y) {
+      return Math.atan2(y, x) * 180 / Math.PI;
+    }
+    
+    /*Converts the degrees to degree between 0 and 90 and inserts it into infotext*/
+    function setInclination(angle){
+        angle = Math.abs(parseFloat(angle));
+        angle = (angle%90);
+        angle = parseFloat(Math.round(angle * 1000) / 1000).toFixed(3);
+        document.getElementById("inc-t").innerHTML=angle;
+    }
+
+    
+    function transformInc(i){
+        line=document.getElementById('inc-line')
+        line.setAttribute("transform", "rotate(" + i + ",60,55)");
     }
     
     
-
+    //////////////////////
 
 </script>
     
@@ -285,18 +338,11 @@ function calculateOrbit(a, e, i){
     }
     
     
-    .info{
-        position: absolute;
-        left: 15px; 
-        top: 290px;
-        width: 505px;
-    }
-    
     .info-outer{
         position: absolute;
         left: 20px;
         top: 20px;
-        background-color: aliceblue;
+        background-color: #d8dfe5;
         border-radius: 20px;
         height: 490px;
         width: 535px;
@@ -322,6 +368,60 @@ function calculateOrbit(a, e, i){
         stroke: cornflowerblue;
         stroke-width: 2;
     }
+    
+    
+    #ecc-text::selection {
+      background: transparent; /* WebKit/Blink Browsers */
+    }
+    #ecc-text::-moz-selection {
+      background: transparent; /* Gecko Browsers */
+    }
+    
+    
+    /*Inclination angle style*/
+    #inc-line{
+       stroke: darkred; 
+        stroke-width: 4px;
+        stroke-linecap: round;
+    }
+    
+    /* Absolute positioning */
+    
+    .outer{
+        position: absolute;
+        top: 310px;
+        width: 155px;
+        background-color: aliceblue;
+        padding: 10px;
+        height: 180px;
+        border-radius: 10px;
+        text-align: center;
+    }
+    
+    #ecc-outer{
+        left: 40px;
+    }
+    
+    #inc-outer{
+        left: 210px;
+    }
+    
+    #axis-outer{
+        left: 380px;
+    }
+    
+    #ecc-svg{
+        position: absolute;
+        top: 355px;
+        left: 55px;
+    }
+    
+    #inc-svg{
+        position: absolute;
+        top: 365px;
+        left: 225px;
+    }
+    
     
 </style>
     
