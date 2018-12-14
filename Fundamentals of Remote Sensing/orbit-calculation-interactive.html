@@ -36,6 +36,7 @@
             <rect id="inc-drag" class="drag" onmousedown="clicked(evt)" width="120" height="120" x="0" y="0"/>
 </svg>
     
+<div><p id="error-msg" style="color: darkred; margin-left: 10px;"></p></div>
     
 <canvas id="mapCanvas" width="512" height="256"></canvas>
 <canvas id="orbitCanvas" width="542" height="286">
@@ -102,11 +103,13 @@ function getOrbit(ele){
     i = document.getElementById("inc-t").innerHTML*Math.PI/180.0;
     if((a*Math.sqrt(1-e*e)) > ree){ //test if input is valid
         orbit = createNdArray(300*num, 2)
+        document.getElementById("error-msg").innerHTML="";
         calculateOrbit(a,e,i);
         drawOrbit();
     }else{
-        console.log('Orbit not permitted');
-    }  
+        handleWrongInput("Sorry, this orbit is not permitted. The satellite would pass through the Earth.")
+    }
+     
 }
     
 
@@ -340,7 +343,7 @@ function calculateOrbit(a, e, i){
         top: 20px;
         background-color: #d8dfe5;
         border-radius: 20px;
-        height: 490px;
+        height: 530px;
         width: 535px;
     }
     
@@ -418,6 +421,12 @@ function calculateOrbit(a, e, i){
         left: 225px;
     }
     
+    #error-msg{
+        width: 500px;
+        position: absolute;
+        left: 40px;
+        top: 495px;
+    }
     
 </style>
     

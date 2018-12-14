@@ -1,0 +1,196 @@
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+<svg id="svg" height="500" width="500" xmlns="http://www.w3.org/2000/svg">
+    <ellipse id="ecc" cx="200" cy="200" rx="100" ry="100"/>
+    <circle id="earth" cx="200" cy="200" r="15" style="fill: darkgreen;"/>
+    <text id="ecc-text" x="200" y="75" text-anchor="middle" stroke="cornflowerblue" dy=".3em">Drag on the circle</text>
+    <rect class="drag" onmousedown="clicked(evt)" width="200" height="200" x="100" y="100"/>
+    <circle id="point" cx="200" cy="200" r="5" style="fill: darkred;"/>
+</svg>
+
+
+<script>
+    
+    var offset = 100; //offset from top of page
+    var maxRad = 100; //max radius, ie radius uf circle
+    document.addEventListener('mouseup', released);
+    var point = document.getElementById('point');//$('#point');
+    var point_start = -1;
+    //move to initial position
+    move();
+    //resize ellipse to inital circle
+    resize(100);
+    
+    //////
+    
+    
+        var T = 200;
+        var z = 0;
+        var cx = 100;
+        var cy = 80;
+        var x = [T]
+        var y = [T]
+        var Y = [T]
+        var th = [T]
+        var eccan = [T];
+        var n = 2.0 * Math.PI/T;
+        var a = 60;
+        var e = Math.sqrt(1 - 1/1);
+        var c; //semimajor axis
+        var distance = 100; //distance of satellite from earth mass
+
+    
+    
+    //////
+    
+    
+    
+    
+        
+    function clicked(evt){
+        document.addEventListener('mousemove', handleMove);
+        handleMove(evt);
+    }
+    
+    function released(){
+        document.removeEventListener('mousemove', handleMove);
+    }
+    
+    function handleMove(evt){
+        var y = evt.pageY - offset;
+        radius=Math.abs(100-y);
+        if (radius>100){
+            radius=100;
+        }
+        resize(radius);
+    }
+    
+    function resize(radius){
+        var semimajaxis=Math.sqrt(maxRad*maxRad - radius*radius)
+        var ec1 = Math.round(semimajaxis/maxRad * 1000) / 1000;
+        if(ec1>0.8){
+            ec1=0.8;
+            semimajaxis=80 //at eccentricity 0.8
+            radius = 60 //at eccentricity 0.8
+        }
+        c = semimajaxis;
+        e = ec1;
+        ellipse = document.getElementById('ecc');
+        ellipse.setAttribute('ry', radius);
+        text=document.getElementById('ecc-text');
+        ec2 = parseFloat(ec1).toFixed(3);
+        text.textContent = 'Eccentricity: ' + ec2;
+        moveEarth();
+        
+    }
+    
+    
+    function moveEarth(){
+        earth = document.getElementById('earth');
+        earth.setAttribute('transform', 'translate('+c+',0)');
+        
+        
+    }
+    
+    /*Calculates distance between satellite and mass (earth)*/
+    function calculateDistance(){
+        //earth
+        earth = document.getElementById('earth');        
+        var earthCtm = earth.getCTM();
+        var earthY = svg.createSVGPoint();
+        earthY.x = earth.getAttribute("x");
+        earthY = earthY.matrixTransform(earthCtm);
+        earthNewX = parseFloat(earth.getAttribute("cx"))+parseFloat(earthY.x);
+        earthNewY = parseFloat(earth.getAttribute("cy"));        
+        
+        //point
+        point = document.getElementById('point');
+        var pointCtm = point.getCTM();
+        var p = svg.createSVGPoint();
+        p.x = point.getAttribute("x");
+        p.y = point.getAttribute("y");
+        p = p.matrixTransform(pointCtm);
+        //absolute values
+        pointX = parseFloat(point.getAttribute("cx"))+p.x
+        pointY = parseFloat(point.getAttribute("cy"))+p.y
+                
+        //pythagoras for distance
+        xdiff = Math.abs(pointX-earthNewX)
+        ydiff = Math.abs(pointY-earthNewY)
+        distance = Math.sqrt((xdiff*xdiff)+(ydiff*ydiff));
+    }
+    
+    
+    //interval for movement
+    setInterval(function(){
+            move();
+    }, 1);
+    
+/* Function to move dot (two different ways, transform and set position)*/
+function move(){
+    
+    //speed up or slow down depending on distance to earth and eccentricity
+    calculateDistance();
+    vtwo = 1/distance - 1/c;
+    var factor=(vtwo*100);
+        if (factor<-0.5 || isNaN(factor)){
+            factor=-0.5;
+        }
+        point_start=point_start+factor;
+      
+    ++point_start;
+    eccRadius=document.getElementById('ecc').getAttribute('ry');
+    xr = Math.sin(point_start * 0.03) * 100;
+    yr = Math.cos(point_start * 0.03) * eccRadius;
+    point.setAttribute('transform', 'translate('+xr+','+yr+')'); 
+}
+
+        
+
+        function calc(){
+                for(var t = 0; t < T; t++){
+                        M = n * t;
+                        ea = M;
+                        do{
+                                del = ea-e*Math.sin(ea)-M;
+                                if(del == 0){
+                                        delea = 0;
+                                }
+                                else delea = del/(1-e*Math.cos(ea));
+                                ea -= delea;
+                        } while(del > 1.0e-6);
+                        eccan[t] = (ea*180.0/Math.PI);
+                        theta = Math.acos((Math.cos(ea)-e)/(1-e*Math.cos(ea)));
+                        if(t > T/2){
+                                theta = 2.0*Math.PI-theta;
+                        }
+                        th[t] = (theta*180.0/Math.PI);
+                        r = (a * (1 - e * e))/(1 + e * Math.cos(theta));
+                        x[t] = (r * Math.cos(theta) + cx + a * e);
+                        y[t] = (cy - r * Math.sin(theta));
+                }
+        }
+    
+
+</script>
+
+<style>
+    .drag{
+        cursor: pointer;
+        fill: transparent;
+    }
+    #ecc{
+        fill: aliceblue;
+        stroke: cornflowerblue;
+        stroke-width: 2;
+    }
+    
+    
+::selection {
+  background: transparent; /* WebKit/Blink Browsers */
+}
+::-moz-selection {
+  background: transparent; /* Gecko Browsers */
+}
+
+</style>
