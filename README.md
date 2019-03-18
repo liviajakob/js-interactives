@@ -1,4 +1,4 @@
-# Interactives for Remote Sensing learning platform
+# Interactives for Remote Sensing Learning Platform
 A collection of interactives for a Remote Sensing learning platform of the University of Edinburgh
 
 Developed by Livia Jakob.
