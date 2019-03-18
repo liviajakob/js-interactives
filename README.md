@@ -3,6 +3,6 @@ A collection of interactives for a Remote Sensing learning platform of the Unive
 
 Developed by Livia Jakob.
 
-Demo: [http://www.livia.geo-blog.com/applets/](http://www.livia.geo-blog.com/applets/)
+**Demo:** [http://www.livia.geo-blog.com/applets/](http://www.livia.geo-blog.com/applets/)
 
 All rights belong to the University of Edinburgh.
